@@ -1,2 +1,2 @@
-import { withDefUse, Route } from "./withDefUse.tsx";
+import { withDefUse, Route } from "./withDefUse";
 export { withDefUse, Route }
