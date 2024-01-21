@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createStore } from './storeFactory.ts';
+import { createStore } from './storeFactory';
 
 
 const DefStore = createStore<{}>();
@@ -57,7 +57,7 @@ const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: Topic
     from && to && from !== to && fromField && toField && (() => {
       const fromState = UseStore(from);
       const toState = DefStore(to);
-      return fromState.subscribe((value) => toState.setState((prevState) => ({ ...prevState, ...{ [toField]: value[fromField] } })));
+      return fromState.subscribe((value:{ [key in Topic]: any; }) => toState.setState((prevState:{}) => ({ ...prevState, ...{ [toField]: value[fromField] } })));
     })();
   }, [from, fromField, to, toField]);
 
