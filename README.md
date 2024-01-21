@@ -1,2 +1,2 @@
 # react-defuse
-A declarative approach to React global state management, inspired by X3Ds DEF, USE and Route.
+A library for declarative state management in React, inspired by X3D, featuring `withDefUse` and `Route` components for intuitive state routing and reusability.
