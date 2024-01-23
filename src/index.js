@@ -1,2 +1,3 @@
-import { withDefUse, Route } from "./withDefUse";
+import { withDefUse } from "./withDefUse";
+import { Route } from "./Route";
 export { withDefUse, Route }

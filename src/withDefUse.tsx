@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createStore } from './storeFactory';
-
-
-const DefStore = createStore<{}>();
-const UseStore = createStore<{}>();
+import { DefStore, UseStore } from './Stores';
 
 
 const useSharedState: (store: typeof DefStore, topic?: string | symbol) => {} = (store, topic) => {
@@ -14,8 +10,6 @@ const useSharedState: (store: typeof DefStore, topic?: string | symbol) => {} = 
 
   return state;
 };
-
-
 
 
 interface BaseType {
@@ -46,24 +40,4 @@ const withDefUse = <P extends {}>(Component: React.ComponentType<P>) => (p: Comb
   return <Component {...{ ...props, ...useState, ...routeState } as unknown as P} />
 }
 
-
-
-
-type Topic = string | symbol
-
-const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: Topic, to: Topic, toField: Topic }) => {
-
-  useEffect(() => {
-    from && to && from !== to && fromField && toField && (() => {
-      const fromState = UseStore(from);
-      const toState = DefStore(to);
-      return fromState.subscribe((value:{ [key in Topic]: any; }) => toState.setState((prevState:{}) => ({ ...prevState, ...{ [toField]: value[fromField] } })));
-    })();
-  }, [from, fromField, to, toField]);
-
-  return null;
-};
-
-
-
-export { withDefUse, Route }
+export { withDefUse }
