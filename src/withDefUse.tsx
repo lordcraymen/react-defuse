@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { DefStore, UseStore } from './Stores';
 
 
-const useSharedState: (store: typeof DefStore, topic?: string | symbol) => {} = (store, topic) => {
+const useSharedState: (store: typeof DefStore, topic?: string | symbol) => any = (store, topic) => {
 
   const [state, setState] = useState(topic ? store(topic).getState() : {})
 
@@ -49,29 +49,6 @@ const withUniqueDef = <P extends {}>(Component: React.ComponentType<P>) => (p: C
   return <Component {...p} />;
 };
 
-const USEInstanceMap = new Map<string | symbol, React.ComponentType<any>>();
-
-const withConsistentDefUse = <P extends {}>(Component: React.ComponentType<P>) => (p: CombinedType<P>) => {
-  const { DEF, USE } = p;
-
-  if (DEF && USEInstanceMap.has(DEF) && USEInstanceMap.get(DEF) !== Component) {
-    console.error(`Component with USE="${DEF.toString()}" must match the type of the DEF component.`);
-    return null;
-  }
-
-  if (USE) {
-    if (!DEFInstanceMap.has(USE)) {
-      console.warn(`No instance with DEF="${USE.toString()}" found.`);
-    } else if (DEFInstanceMap.get(USE) !== Component) {
-      console.error(`Components using the same identifier "${USE.toString()}" have to be of the same type.`);
-      return null;
-    }
-    USEInstanceMap.set(USE, Component); // Register the USE component type
-  }
-
-  return <Component {...p} />;
-};
-
 
 const withDefUse = <P extends {}>(Component: React.ComponentType<P>) => (p: CombinedType<P>) => {
   const { DEF, USE, ...props } = p;
@@ -84,4 +61,4 @@ const withDefUse = <P extends {}>(Component: React.ComponentType<P>) => (p: Comb
   return <Component {...{ ...props, ...useState, ...routeState } as unknown as P} />
 }
 
-export { withDefUse, withConsistentDefUse, withUniqueDef }
+export { withDefUse, withUniqueDef }
