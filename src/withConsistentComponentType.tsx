@@ -4,11 +4,15 @@ type Topic = string | symbol
 
 const componentInstances = new Map<string | symbol, { type: React.ComponentType<any>, instanceCount:number}>();
 
-const checkConsistency = (identifier:Topic | undefined ,Component:React.ComponentType<any>) => !identifier || (componentInstances.get(identifier)?.type === Component);
+const checkConsistency = (identifier:Topic ,Component:React.ComponentType<any>) => {
+  const entry = componentInstances.get(identifier);
+  return !entry || entry["type"] === Component; 
+}
+
 
 const withConsistentComponentType = <P extends { DEF?: Topic, USE?: Topic }>(Component: React.ComponentType<P>) => {
   return (props: P) => {
-    const { DEF, USE,...restProps } = props;
+    const { DEF, USE } = props;
     const identifier = DEF || USE;
 
     useEffect(() => {
@@ -33,8 +37,8 @@ const withConsistentComponentType = <P extends { DEF?: Topic, USE?: Topic }>(Com
       };
     }, [identifier, Component]);
 
-    const isConsistent = checkConsistency(identifier,Component)
-    return  <Component { ...(isConsistent ? props : restProps) as P} />;
+    const isConsistent = checkConsistency(identifier!,Component)
+    return isConsistent ? <Component { ...props} /> : null;
   };
 };
 
