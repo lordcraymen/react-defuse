@@ -14,7 +14,7 @@ describe('withDefUse', () => {
     expect(getByText('Test Component')).toBeInTheDocument();
   });
 
-  it('the USE component should use the properties defined by DEF', () => {
+  it('should USE the properties defined by DEF', () => {
     const TestComponentwithDefUse = withDefUse(TestComponent);
     render(<TestComponentwithDefUse DEF="sharedState" test="Test Component"/>);
     
