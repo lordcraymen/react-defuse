@@ -1,9 +1,4 @@
 # react-defuse
-A library for declarative state management in React, inspired by X3D, featuring `withDefUse` hoc and a `Route` component for intuitive state routing and reusability.
-
-
-
-# react-defuse
 
 `react-defuse` is designed for declarative state management in React applications. Drawing inspiration from X3D, this library introduces a unique blend of concepts with its `withDefUse` higher-order component (HOC) and a `Route` component. State management is inspired by libraries like recoil and is implemented with a sub-pub-pattern for efficient and precise update of components using the shared state without rerendering the complete component tree.
 
