@@ -36,19 +36,14 @@ We have two component instances:
 - **DEF**: <ComponentWithDefUse DEF="sharedTopicID" {...properties} /> Defines a shared state that inclused the properites defined by the interface of the component definition wrapped my the `withDefUse` hoc.
 - **USE**: <ComponentWithDefUse USE="sharedTopicID" /> Consumes the shared state. properties defined on the consuming component will be ignored
 
-### Step 1: Define the Shared State with `DEF`
-
-In `SharedStateProvider`, we use `withDefUse` to define the shared state.
 
 ```jsx
-import React from 'react';
-import { withDefUse } from 'react-defuse';
+import React from 'react'
+import { withDefUse } from 'react-defuse'
 
-const ComponentWithDefUse = withDefUse(({ message }) => {
-  return <div>Message: {message}</div>;
-});
+const ComponentWithDefUse = withDefUse(({ message }) => <div>Message: {message}</div>)
 
-// Usage
+// DEFining the state
 const messageText = "hello world!"
 <ComponentWithDefUse DEF="sharedMessage" message={messageText} />
 
@@ -56,10 +51,10 @@ const messageText = "hello world!"
 somewhere in the component tree
 ...
 
-// The component will render <div>DEF Message: hello world!</div>
+// USEing the state. The component will render <div>DEF Message: hello world!</div>
 <ComponentWithDefUse USE="sharedMessage" />
 
-
+```
 
 
 
