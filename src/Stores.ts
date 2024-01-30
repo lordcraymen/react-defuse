@@ -1,7 +1,7 @@
-import { createStore } from './storeFactory';
-import { Topic  } from './types';
+import { createStore } from "./storeFactory"
+import { Topic  } from "./types"
 
-const DefStore = createStore<{[key in Topic]: any;}>();
-const UseStore = createStore<{[key in Topic]: any;}>();
+const DefStore = createStore<{[key in Topic]: unknown}>()
+const UseStore = createStore<{[key in Topic]: unknown}>()
 
 export {DefStore, UseStore}
