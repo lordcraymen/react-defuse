@@ -30,10 +30,10 @@ This example demonstrates how to use `withDefUse` for sharing state between comp
 
 ### Scenario
 
-We have two components:
+We have two component instances:
 
-- **SharedStateProvider**: Defines a shared state.
-- **SharedStateConsumer**: Consumes the shared state.
+- **DEF**: <ComponentWithDefUse DEF="sharedTopicID" {...properties} /> Defines a shared state that inclused the properites defined by the interface of the component definition wrapped my the `withDefUse` hoc.
+- **USE**: <ComponentWithDefUse USE="sharedTopicID" /> Consumes the shared state. properties defined on the consuming component will be ignored
 
 ### Step 1: Define the Shared State with `DEF`
 
