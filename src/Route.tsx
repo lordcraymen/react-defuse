@@ -1,8 +1,6 @@
 import React, { useEffect } from "react"
 import {DefStore, UseStore} from "./Stores"
-
-
-type Topic = string | symbol
+import { Topic } from "./types"
 
 const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: Topic, to: Topic, toField: Topic }) => {
 
