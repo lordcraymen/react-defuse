@@ -3,7 +3,7 @@ import { render, cleanup, screen } from '@testing-library/react';
 import { withDefUse } from '../src/withDefUse';
 
 // Mock components for testing
-const TestComponent = ({test}:{test:string}) => test;
+const TestComponent = ({test}:{test?:string}) => test;
 
 describe('withDefUse', () => {
   afterEach(cleanup);
