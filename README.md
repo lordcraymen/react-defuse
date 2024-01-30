@@ -22,6 +22,7 @@ To integrate `react-defuse` into your project, run the following command:
 
 ```bash
 npm install react-defuse
+```
 
 
 ## Usage Example with `withDefUse`
