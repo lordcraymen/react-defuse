@@ -26,5 +26,16 @@ describe('withUniqueDef', () => {
     expect(console.error).toHaveBeenCalledWith('Identifier "sameIdentifier" has to be unique.');
     console.error = originalConsoleError;
   });
+
+  it('should render the component if a component with the same DEF does not exist at the same time', () => {
+    const TestComponentWithUniqueDef = withUniqueDef(TestComponent);
+
+    const { unmount } = render(<TestComponentWithUniqueDef DEF="sameIdentifier" test="Test Component"/>);
+    unmount();
+    const { getByText} = render(<TestComponentWithUniqueDef DEF="sameIdentifier" test="Instance with same DEF"/>);
+
+    expect(getByText('Instance with same DEF')).toBeInTheDocument();
+    
+  });
   
 });
