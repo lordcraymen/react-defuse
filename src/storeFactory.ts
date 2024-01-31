@@ -14,8 +14,8 @@ const createStore = <T>() => {
 
 			sharedState.set(topic, {
 				getState: () => state,
-				setState: (newState: T | undefined) => {
-					state = (typeof newState === "function" ? newState(state) : newState) || state
+				setState: (newState: T | undefined | ((prevState:T|undefined) => T)) => {
+					state = (typeof newState === "function" ? (newState as (prevState: T|undefined) => T)(state) : newState) || state
 					state && subscribers.forEach(cb => cb(state as T))
 				},
 				subscribe: (cb) => {

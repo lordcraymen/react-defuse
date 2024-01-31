@@ -1,6 +1,6 @@
 import React from "react"
 import { render, cleanup, screen } from "@testing-library/react"
-import { withDefUse } from "../src/withDefUse"
+import { withDefUse, updateDef } from "../src/withDefUse"
 
 // Mock components for testing
 const TestComponent = ({test}:{test?:string}) => test
@@ -25,5 +25,21 @@ describe("withDefUse", () => {
 		expect(instanceCount).not.toBe(1)
 		expect(instanceCount).toBe(3)
 	})
+
+	it("should update when updateDEF is called", () => {
+		const TestComponentwithDefUse = withDefUse(TestComponent)
+		render(<TestComponentwithDefUse DEF="sharedState" test="Test Component"/>)
+    
+		// the DEF component should override props set on the USE component
+		render(<TestComponentwithDefUse USE="sharedState" test="Some other value"/>)
+		render(<TestComponentwithDefUse USE="sharedState"/>)
+		
+		updateDef("sharedState",{test:"updated through updateDef"})
+
+		const instanceCount = screen.getAllByText("Test Component").length
+		expect(instanceCount).not.toBe(1)
+		expect(instanceCount).toBe(3)
+	})
+
   
 })
