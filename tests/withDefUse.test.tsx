@@ -1,5 +1,5 @@
 import React from "react"
-import { render, cleanup, screen } from "@testing-library/react"
+import { render, cleanup, screen, act } from "@testing-library/react"
 import { withDefUse, updateDef } from "../src/withDefUse"
 
 // Mock components for testing
@@ -34,9 +34,9 @@ describe("withDefUse", () => {
 		render(<TestComponentwithDefUse USE="sharedState" test="Some other value"/>)
 		render(<TestComponentwithDefUse USE="sharedState"/>)
 		
-		updateDef("sharedState",{test:"updated through updateDef"})
+		act(()=> updateDef("sharedState",{test:"updated through updateDef"}))
 
-		const instanceCount = screen.getAllByText("Test Component").length
+		const instanceCount = screen.getAllByText("updated through updateDef").length
 		expect(instanceCount).not.toBe(1)
 		expect(instanceCount).toBe(3)
 	})

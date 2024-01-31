@@ -13,10 +13,11 @@ const createStore = <T>() => {
 			const subscribers = new Set<(state: T) => void>()
 
 			sharedState.set(topic, {
-				getState: () => state,
+				getState: () => ({ ...state } as T),
 				setState: (newState: T | undefined | ((prevState:T|undefined) => T)) => {
 					state = (typeof newState === "function" ? (newState as (prevState: T|undefined) => T)(state) : newState) || state
 					state && subscribers.forEach(cb => cb(state as T))
+					return { ...state } as T
 				},
 				subscribe: (cb) => {
 					subscribers.add(cb)
