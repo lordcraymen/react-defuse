@@ -1,7 +1,9 @@
+import { Topic } from "./types";
+
 type SharedStateStore<T> = {
   getState: () => T | undefined;
   setState: (newState: T) => void;
-  subscribe: (callback: (value: T | undefined) => void) => () => void;
+  subscribe: (callback: (value: T | ((value: T) => T) | undefined) => void) => () => void;
 };
 
 const createStore = <T>() => {
@@ -14,7 +16,7 @@ const createStore = <T>() => {
 
 			sharedState.set(topic, {
 				getState: () => ({ ...state } as T),
-				setState: (newState: T | undefined | ((prevState:T|undefined) => T)) => {
+				setState: (newState: T | undefined | ((prevState:{ [key: Topic]: unknown; }) => T)) => {
 					state = (typeof newState === "function" ? (newState as (prevState: T|undefined) => T)(state) : newState) || state
 					state && subscribers.forEach(cb => cb(state as T))
 					return { ...state } as T

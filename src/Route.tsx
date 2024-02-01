@@ -8,7 +8,7 @@ const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: Topic
 		from && to && from !== to && fromField && toField && (() => {
 			const fromState = UseStore(from)
 			const toState = DefStore(to)
-			const update = (value:{[key:Topic]:unknown}|undefined) => { value && toState.setState((prevState:object) => ({ ...prevState, ...{ [toField]: value[fromField] } } )) }
+			const update = (value:{[key:Topic]:unknown}|undefined) => { value && toState.setState((prevState:{[key: Topic]: unknown}) => ({ ...prevState, ...{ [toField]: value[fromField] } } )) }
 			update(fromState.getState())
 			return fromState.subscribe(update)
 		})()
