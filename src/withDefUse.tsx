@@ -9,7 +9,7 @@ const useStoreTopic: (store: typeof DefStore, topic?: Topic) => object = (store,
 
 	const [state, setState] = useState<State | unknown >(topic ? store(topic).getState() as State : {})
 
-	useEffect(() => topic ? store(topic).subscribe((newState) => setState(newState)) : () => {}, [topic])
+	useEffect(() => topic ? store(topic).subscribe((newState) => setState(newState)).unsubscribe : () => {}, [topic])
 
 	return state!
 }

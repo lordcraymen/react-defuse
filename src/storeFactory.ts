@@ -3,7 +3,7 @@ import { Topic, State, StateTransformer } from "./types";
 type SharedStateStore = {
   getState: () => State;
   setState: (newState: State | StateTransformer ) => void;
-  subscribe: (callback: (value: State | undefined) => void) => () => void;
+  subscribe: (callback: (value: State | undefined) => void) => {unsubscribe: () => void};
 };
 
 const createStore = () => {
@@ -23,7 +23,7 @@ const createStore = () => {
 				},
 				subscribe: (cb) => {
 					subscribers.add(cb)
-					return () => subscribers.delete(cb)
+					return { unsubscribe: () => subscribers.delete(cb) }
 				}
 			})
 		}
