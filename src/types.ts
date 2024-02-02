@@ -17,4 +17,7 @@ interface TypeWithUse<T> extends BaseType {
 
 type TypeWithDefAndUse<T> = (TypeWithUse<T> | TypeWithDef<T>) & T;
 
-export {type Topic, type TypeWithDefAndUse }
+type State = Record<Topic,unknown>
+type StateTransformer = (previousState:State) => State
+
+export {type Topic, type TypeWithDefAndUse, type State, type StateTransformer }

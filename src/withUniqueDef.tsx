@@ -2,7 +2,7 @@
 import React, { useEffect } from "react"
 import {Topic, TypeWithDefAndUse } from "./types"
 
-const DEFInstanceMap = new Map<Topic, React.ComponentType<unknown>>()
+const DEFInstanceMap = new Map<Topic, React.ComponentType<any>>()
 
 const withUniqueDef = <P extends object>(Component: React.ComponentType<P>) => (p: TypeWithDefAndUse<P>) => {
 	const { DEF } = p

@@ -1,25 +1,25 @@
-import { Topic } from "./types";
+import { Topic, State, StateTransformer } from "./types";
 
-type SharedStateStore<T> = {
-  getState: () => T | undefined;
-  setState: (newState: T) => void;
-  subscribe: (callback: (value: T | ((value: T) => T) | undefined) => void) => () => void;
+type SharedStateStore = {
+  getState: () => State;
+  setState: (newState: State | StateTransformer ) => void;
+  subscribe: (callback: (value: State | undefined) => void) => () => void;
 };
 
-const createStore = <T>() => {
-	const sharedState = new Map<string | symbol, SharedStateStore<T>>()
+const createStore = () => {
+	const sharedState = new Map<Topic, SharedStateStore>()
 
-	return (topic: string | symbol): SharedStateStore<T> => {
+	return (topic: Topic): SharedStateStore => {
 		if (!sharedState.has(topic)) {
-			let state = <T | undefined>{}
-			const subscribers = new Set<(state: T) => void>()
+			let state = <State | undefined>{}
+			const subscribers = new Set<(state: State) => void>()
 
 			sharedState.set(topic, {
-				getState: () => ({ ...state } as T),
-				setState: (newState: T | undefined | ((prevState:{ [key: Topic]: unknown; }) => T)) => {
-					state = (typeof newState === "function" ? (newState as (prevState: T|undefined) => T)(state) : newState) || state
-					state && subscribers.forEach(cb => cb(state as T))
-					return { ...state } as T
+				getState: () => ({ ...state } as State),
+				setState: (newState: State | StateTransformer) => {
+					state = (typeof newState === "function" ? (newState)(state as State) : newState) || state
+					state && subscribers.forEach(cb => cb(state as State))
+					return { ...state } as State
 				},
 				subscribe: (cb) => {
 					subscribers.add(cb)
