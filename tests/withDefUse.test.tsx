@@ -1,54 +1,48 @@
 import React from "react"
-import { render, cleanup, screen, act } from "@testing-library/react"
+import { render, cleanup, screen, act, waitFor } from "@testing-library/react"
 import { withDefUse, updateDef } from "../src/withDefUse"
-import { UseStore } from "../src/Stores"
-import { State } from "../src/types"
 
 // Mock components for testing
-const TestComponent = ({test}:{test?:string}) => test
+const TestComponent = ({ test }: { test?: string }) => test
 
 describe("withDefUse", () => {
 	afterEach(cleanup)
 
 	it("should render the component if neither DEF or USE is set", () => {
 		const EnhancedComponent = withDefUse(TestComponent)
-		const { getByText } = render(<EnhancedComponent test="Test Component"/>)
-		expect(getByText("Test Component")).toBeInTheDocument()
+		render(<EnhancedComponent test="Test Component" />)
+		const instanceCount = screen.getAllByText("Test Component").length
+		expect(instanceCount).toBe(1)
 	})
 
 	it("should USE the properties defined by DEF", () => {
 		const TestComponentwithDefUse = withDefUse(TestComponent)
-		render(<TestComponentwithDefUse DEF="sharedState" test="Test Component"/>)
-    
+		render(<TestComponentwithDefUse DEF="sharedState" test="Test Component" />)
+
 		// the DEF component should override props set on the USE component
-		render(<TestComponentwithDefUse USE="sharedState" test="Some other value"/>)
-		render(<TestComponentwithDefUse USE="sharedState"/>)
+		render(<TestComponentwithDefUse USE="sharedState" test="Some other value" />)
+		render(<TestComponentwithDefUse USE="sharedState" />)
 		const instanceCount = screen.getAllByText("Test Component").length
 		expect(instanceCount).not.toBe(1)
 		expect(instanceCount).toBe(3)
 	})
 
 	it("should update when updateDEF is called", () => {
-		const originalConsoleLog = console.log
-		jest.spyOn(console, "log").mockImplementation(() => {})
 		const TestComponentwithDefUse = withDefUse(TestComponent)
-		render(<TestComponentwithDefUse DEF="sharedState" test="Test Component"/>)
-    
+		render(<TestComponentwithDefUse DEF="sharedState" test="Test Component" />)
+
 		// the DEF component should override props set on the USE component
-		render(<TestComponentwithDefUse USE="sharedState" test="Some other value"/>)
-		render(<TestComponentwithDefUse USE="sharedState"/>)
-		
-		act(()=> updateDef("sharedState",{"test":"updated through updateDef"}))
+		render(<TestComponentwithDefUse USE="sharedState" test="Some other value" />)
+		render(<TestComponentwithDefUse USE="sharedState" />)
 
-		UseStore("test").subscribe((value:State|undefined) => { console.log(value) } )
-		act(()=> updateDef("test",{test:"updated through updateDef"}))
-		expect(console.log).toHaveBeenCalledWith({"test": "updated through updateDef"})
+		act(() => updateDef("sharedState", { "test": "updated through updateDef" }))
 
-		//const instanceCount = screen.getAllByText("updated through updateDef").length
-		//expect(instanceCount).not.toBe(1)
-		//expect(instanceCount).toBe(3)
-		console.log = originalConsoleLog
+		waitFor(() => {
+			const instanceCount = screen.getAllByText("updated through updateDef").length
+			expect(instanceCount).not.toBe(1)
+			expect(instanceCount).toBe(3)
+		})
 	})
 
-  
+
 })

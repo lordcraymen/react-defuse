@@ -11,8 +11,9 @@ describe("withConsistentComponentType", () => {
 
 	it("should render the component if neither DEF or USE is set", () => {
 		const EnhancedComponent = withConsistentComponentType(TestComponent)
-		const { getByText } = render(<EnhancedComponent test="Test Component"/>)
-		expect(getByText("Test Component")).toBeInTheDocument()
+		render(<EnhancedComponent test="Test Component"/>)
+		const component = screen.getAllByText("Test Component").length
+		expect(component).toBe(1)
 	})
 
 	it("should render the USE component if DEF is set on the same component type", () => {

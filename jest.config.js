@@ -1,5 +1,5 @@
 module.exports = {
-    setupFilesAfterEnv: ['@testing-library/jest-dom'],
-    testEnvironment: "jsdom"
-};
+	setupFilesAfterEnv: ["@testing-library/jest-dom"],
+	testEnvironment: "jsdom"
+}
   
