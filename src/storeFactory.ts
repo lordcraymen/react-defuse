@@ -23,7 +23,16 @@ const createStore = () => {
 				},
 				subscribe: (cb) => {
 					subscribers.add(cb)
-					return { unsubscribe: () => subscribers.delete(cb) }
+					return { 
+						syncState: (newState:State) => { 
+							if(newState) {
+								state = {...state,...newState} 
+								state && subscribers.forEach(sub => sub !== cb && sub(state as State))
+							} 
+							return {...state} 
+						},
+						unsubscribe: () => subscribers.delete(cb) 
+					}
 				}
 			})
 		}

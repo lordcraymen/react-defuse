@@ -10,7 +10,7 @@ const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: Topic
 			const toState = DefStore(to)
 			const update = (value:State) => { value && toState.setState((prevState:State) => ({ ...prevState, ...{ [toField]: value[fromField] } } )) }
 			update(fromState.getState() as State)
-			return fromState.subscribe(update as any)
+			return fromState.subscribe(update as ()=>void)
 		})()
 	}, [from, fromField, to, toField])
 
