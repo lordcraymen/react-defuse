@@ -1,9 +1,13 @@
-import { Topic, State, StateTransformer } from "./types";
+import { Topic, State, StateTransformer } from "./types"
 
 type SharedStateStore = {
-  getState: () => State;
-  setState: (newState: State | StateTransformer ) => void;
-  subscribe: (callback: (value: State | undefined) => void) => {unsubscribe: () => void};
+	getState: () => State;
+	setState: (newState: State | StateTransformer) => void;
+	subscribe: (callback: (value: State | undefined) => void) =>
+		{
+			unsubscribe: () => void,
+			syncState: (s: State) => State
+		};
 };
 
 const createStore = () => {
@@ -23,15 +27,15 @@ const createStore = () => {
 				},
 				subscribe: (cb) => {
 					subscribers.add(cb)
-					return { 
-						syncState: (newState:State) => { 
-							if(newState) {
-								state = {...state,...newState} 
+					return {
+						syncState: (newState: State) => {
+							if (newState) {
+								state = { ...state, ...newState }
 								state && subscribers.forEach(sub => sub !== cb && sub(state as State))
-							} 
-							return {...state} 
+							}
+							return { ...state }
 						},
-						unsubscribe: () => subscribers.delete(cb) 
+						unsubscribe: () => subscribers.delete(cb)
 					}
 				}
 			})
