@@ -31,7 +31,7 @@ const createStore = () => {
 					return {
 						syncState: (newState: State) => {
 							if (newState) {
-								state = { ...state, ...newState }
+								state = (typeof state === "function" ? state(newState as State) : newState) || state
 								state && subscribers.forEach(sub => sub !== cb && sub(state as State))
 							}
 							return { ...state }
