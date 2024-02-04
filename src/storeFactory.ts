@@ -29,9 +29,9 @@ const createStore = () => {
 					subscribers.add(cb)
 					if (typeof transformer === "function") state = transformer
 					return {
-						syncState: (newState: State) => {
+						syncState: (newState: State | StateTransformer) => {
 							if (newState) {
-								state = (typeof state === "function" ? state(newState as State) : newState) || state
+								state = (typeof state === "function" ? state((typeof newState === "function" ? newState(sharedState.get(topic)!.getState()) : newState) as State) : newState) || state
 								state && subscribers.forEach(sub => sub !== cb && sub(state as State))
 							}
 							return { ...state }
