@@ -2,9 +2,9 @@
 import React, { useEffect } from "react"
 import {Topic, TypeWithDefAndUse } from "./types"
 
-const componentInstances = new Map<string | symbol, { type: React.ComponentType<any>, instanceCount:number}>()
+const componentInstances = new Map<string | symbol, { "type": React.ComponentType, instanceCount:number}>()
 
-const checkConsistency = (identifier:Topic | undefined ,Component:React.ComponentType<any>) => {
+const checkConsistency = (identifier:Topic | undefined ,Component:React.ComponentType<unknown>) => {
 	const entry = componentInstances.get(identifier!)
 	return !entry || entry["type"] === Component
 }
@@ -12,7 +12,7 @@ const checkConsistency = (identifier:Topic | undefined ,Component:React.Componen
 const withConsistentComponentType = <P extends object>(Component: React.ComponentType<P>) => (props: TypeWithDefAndUse<P>) => {
 	const { DEF, USE } = props
 	const identifier = DEF || USE
-	const isConsistent = checkConsistency(identifier, Component)
+	const isConsistent = checkConsistency(identifier, Component as React.ComponentType<unknown>)
 
 	useEffect(() => {
 		if(!identifier) return
@@ -25,7 +25,7 @@ const withConsistentComponentType = <P extends object>(Component: React.Componen
 		const entry = componentInstances.get(identifier)
 
 		if (!entry) {
-			componentInstances.set(identifier, { type: Component, instanceCount: 1 })
+			componentInstances.set(identifier, { type: Component as React.ComponentType, instanceCount: 1 })
 		} else {
 			entry.instanceCount++
 		}

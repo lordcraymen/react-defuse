@@ -2,8 +2,8 @@ import { Topic, State, StateTransformer } from "./types"
 
 type SharedStateStore = {
 	getState: () => State;
-	setState: (newState: State | StateTransformer) => void;
-	subscribe: (callback: (value: State | undefined) => void) =>
+	setState: (newState: State) => void;
+	subscribe: (callback: (value: State | undefined) => void, stateTransformer?: StateTransformer) =>
 		{
 			unsubscribe: () => void,
 			syncState: (s: State) => State
@@ -15,18 +15,19 @@ const createStore = () => {
 
 	return (topic: Topic): SharedStateStore => {
 		if (!sharedState.has(topic)) {
-			let state = <State | undefined>{}
+			let state = <State | StateTransformer | undefined>{}
 			const subscribers = new Set<(state: State) => void>()
 
 			sharedState.set(topic, {
-				getState: () => ({ ...state } as State),
-				setState: (newState: State | StateTransformer) => {
-					state = (typeof newState === "function" ? (newState)(state as State) : newState) || state
+				getState: () => typeof state === "function" ? state() : { ...state },
+				setState: (newState: State) => {
+					state = (typeof state === "function" ? state(newState as State) : newState) || state
 					state && subscribers.forEach(cb => cb(state as State))
-					return { ...state } as State
+					return sharedState.get(topic)!.getState()
 				},
-				subscribe: (cb) => {
+				subscribe: (cb, transformer) => {
 					subscribers.add(cb)
+					if (typeof transformer === "function") state = transformer
 					return {
 						syncState: (newState: State) => {
 							if (newState) {
@@ -35,7 +36,9 @@ const createStore = () => {
 							}
 							return { ...state }
 						},
-						unsubscribe: () => subscribers.delete(cb)
+						unsubscribe: () => {
+							subscribers.delete(cb)
+						}
 					}
 				}
 			})
