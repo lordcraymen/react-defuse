@@ -20,4 +20,6 @@ type TypeWithDefAndUse<T> = (TypeWithUse<T> | TypeWithDef<T>) & T;
 type State = Record<Topic,unknown>
 type StateTransformer = (newState?:State) => State
 
-export {type Topic, type TypeWithDefAndUse, type State, type StateTransformer }
+type PureFunction<T extends State> = (props:T) => T
+
+export {type Topic, type TypeWithDefAndUse, type State, type StateTransformer, type PureFunction }
