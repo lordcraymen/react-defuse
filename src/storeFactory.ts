@@ -2,7 +2,7 @@ import { Topic, State, StateTransformer } from "./types"
 
 type SharedStateStore = {
 	getState: () => State;
-	setState: (newState: State) => void;
+	setState: (newState: State | StateTransformer) => State;
 	subscribe: (callback: (value: State | undefined) => void, stateTransformer?: StateTransformer) =>
 		{
 			unsubscribe: () => void,
@@ -20,7 +20,7 @@ const createStore = () => {
 
 			sharedState.set(topic, {
 				getState: () => typeof state === "function" ? state() : { ...state },
-				setState: (newState: State) => {
+				setState: (newState) => {
 					state = (typeof state === "function" ? state(newState as State) : newState) || state
 					state && subscribers.forEach(cb => cb(state as State))
 					return sharedState.get(topic)!.getState()
