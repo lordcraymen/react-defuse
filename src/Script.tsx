@@ -7,7 +7,7 @@ interface ScriptProps<T extends State> {
     DEF: string;
 }
 
-const Script = <T extends State>({ children, DEF, ...restProps }: React.Component<T>) => {
+const Script = <T extends State>({ children, DEF, ...restProps }: ScriptProps<T>) => {
 
 	const child = useRef(children)
 
@@ -15,7 +15,7 @@ const Script = <T extends State>({ children, DEF, ...restProps }: React.Componen
 
 	useEffect(() => {
 		if (DEF && child.current) {
-			const subscription = UseStore(DEF).subscribe(()=>{},child.current as unknown as StateTransformer)
+			const subscription = UseStore(DEF).subscribe(undefined,child.current as unknown as StateTransformer)
 			subscription.syncState(restProps)
 			return () => { subscription.unsubscribe() }
 		}
