@@ -14,7 +14,7 @@ const withDefUse = <P extends object>(Component: React.ComponentType<P>) => (p: 
 	const subscripton = topic.subscribe((newState) => { newState && setSharedState(newState) }) 
 
 	useEffect(() => { 
-		DEF && subscripton.syncState({...props}) 
+		DEF &&  props && Object.keys(props).length !== 0 && subscripton.syncState({...props}) 
 		return () => { subscripton.unsubscribe() } 
 	}, [props,subscripton,DEF])
 
