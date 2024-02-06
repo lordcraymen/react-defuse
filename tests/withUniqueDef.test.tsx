@@ -10,8 +10,9 @@ describe("withUniqueDef", () => {
 
 	it("should render the component if neither DEF or USE is set", () => {
 		const TestComponentWithUniqueDef = withUniqueDef(TestComponent)
-		const { getByText } = render(<TestComponentWithUniqueDef test="Test Component"/>)
-		expect(getByText("Test Component")).toBeInTheDocument()
+		render(<TestComponentWithUniqueDef test="Test Component"/>)
+		const instanceCount = screen.getAllByText("Test Component").length
+		expect(instanceCount).toBe(1)
 	})
 
 	it("should not render the component if a component with the same DEF already exists", () => {
@@ -32,10 +33,10 @@ describe("withUniqueDef", () => {
 
 		const { unmount } = render(<TestComponentWithUniqueDef DEF="sameIdentifier" test="Test Component"/>)
 		unmount()
-		const { getByText} = render(<TestComponentWithUniqueDef DEF="sameIdentifier" test="Instance with same DEF"/>)
+		render(<TestComponentWithUniqueDef DEF="sameIdentifier" test="Instance with same DEF"/>)
 
-		expect(getByText("Instance with same DEF")).toBeInTheDocument()
-    
+		const instanceCount = screen.getAllByText("Instance with same DEF").length
+		expect(instanceCount).toBe(1)
 	})
   
 })

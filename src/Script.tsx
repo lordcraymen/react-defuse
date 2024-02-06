@@ -22,6 +22,8 @@ const Script = <T extends State>({ children, DEF, ...restProps }: ScriptProps<T>
 
 	}, [DEF, restProps])
 
+	return null
+
 }
 
 export { Script }

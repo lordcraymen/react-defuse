@@ -10,7 +10,7 @@ const checkConsistency = (identifier:Topic | undefined ,Component:React.Componen
 }
 
 const withConsistentComponentType = <P extends object>(Component: React.ComponentType<P>) => (props: TypeWithDefAndUse<P>) => {
-	const { DEF, USE } = props
+	const { DEF, USE } = props as {DEF?:Topic,USE?:Topic}
 	const identifier = DEF || USE
 	const isConsistent = checkConsistency(identifier, Component as React.ComponentType<unknown>)
 

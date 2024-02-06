@@ -7,7 +7,7 @@ import {Topic, TypeWithDefAndUse, State } from "./types"
 const updateDef = (topic:Topic,newState:State) => UseStore(topic).setState(newState)
 
 const withDefUse = <P extends object>(Component: React.ComponentType<P>) => (p: TypeWithDefAndUse<P>) => {
-	const { DEF, USE, ...props } = p
+	const { DEF, USE, ...props } = p as {DEF?:Topic,USE?:Topic}
 
 	const topic = UseStore(DEF || USE as Topic)
 	const [sharedState, setSharedState ] = useState(topic.getState())

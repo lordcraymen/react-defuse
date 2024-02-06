@@ -13,7 +13,9 @@ describe("Script", () => {
     it("should transform the input of the incoming Route to the outgoing Route", () => {
         render(<TestComponentWithDefUse DEF="Start" foo="4"/>)
         render(<OtherComponentWithDefUse DEF="Target" />)
-        render(<Script DEF="Transformer">{({foo}) => ({...{foo: foo * 3}})}</Script>)
+        render(<Script DEF="Transformer">{
+            ({foo}:{foo:number}) => ({...{foo: foo * 3}})}
+        </Script>)
         render(<Route from="Starrt2" fromField="foo" to="Transformer" toField="foo" />)
         render(<Route from="Transformer" fromField="foo" to="target" toField="bar" />)
         waitFor(() => {

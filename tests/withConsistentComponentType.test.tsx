@@ -22,8 +22,9 @@ describe("withConsistentComponentType", () => {
 		render(<TestComponentwithConsistentComponentType DEF="sharedIdentifier" />)
 
 		// Then, try to render with USE and the same component type
-		const { queryByText } = render(<TestComponentwithConsistentComponentType USE="sharedIdentifier" test="Using Component"/>)
-		expect(queryByText("Using Component")).toBeInTheDocument()
+		render(<TestComponentwithConsistentComponentType USE="sharedIdentifier" test="Using Component"/>)
+		const component = screen.getAllByText("Using Component").length
+		expect(component).toBe(1)
 	})
 
   

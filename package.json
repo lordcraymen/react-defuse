@@ -1,6 +1,6 @@
 {
     "name": "react-defuse",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "description": "A library for declarative state management in React, inspired by X3D, featuring `withDefUse` and `Route` components for intuitive state routing and reusability.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
