@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react"
+import { useRef, useEffect } from "react"
 import { UseStore } from "./Stores"
 import { PureFunction, StateTransformer, State } from "./types"
 

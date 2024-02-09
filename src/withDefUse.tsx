@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import { UseStore } from "./Stores"
 import {Topic, TypeWithDefAndUse, State } from "./types"
 
+const isEmpty = (obj:object) => obj && JSON.stringify(obj) === "{}"
 
 const updateDef = (topic:Topic,newState:State) => UseStore(topic).setState(newState)
 
@@ -14,7 +15,7 @@ const withDefUse = <P extends object>(Component: React.ComponentType<P>) => (p: 
 	const subscripton = topic.subscribe((newState) => { newState && setSharedState(newState) }) 
 
 	useEffect(() => { 
-		DEF &&  props && Object.keys(props).length !== 0 && subscripton.syncState({...props}) 
+		DEF && !isEmpty(props) && subscripton.syncState(props) 
 		return () => { subscripton.unsubscribe() } 
 	}, [props,subscripton,DEF])
 
