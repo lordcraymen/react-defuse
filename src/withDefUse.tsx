@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import { UseStore } from "./Stores"
 import {Topic, TypeWithDefAndUse, State } from "./types"
 
-const isEmpty = (obj:object) => obj && JSON.stringify(obj) === "{}"
+const isEmpty = (obj:object) => Object.keys(obj).lengths === 0 
 
 const updateDef = (topic:Topic,newState:State) => UseStore(topic).setState(newState)
 
