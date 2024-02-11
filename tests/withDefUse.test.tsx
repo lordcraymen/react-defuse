@@ -27,7 +27,7 @@ describe("withDefUse", () => {
 		expect(instanceCount).toBe(3)
 	})
 
-	it("should update when updateDEF is called", () => {
+	it("should update when updateDEF is called", async () => {
 		const TestComponentwithDefUse = withDefUse(TestComponent)
 		render(<TestComponentwithDefUse DEF="sharedState" test="Test Component" />)
 
@@ -37,7 +37,7 @@ describe("withDefUse", () => {
 
 		act(() => updateDef("sharedState", { "test": "updated through updateDef" }))
 
-		waitFor(() => {
+		await waitFor(() => {
 			const instanceCount = screen.getAllByText("updated through updateDef").length
 			expect(instanceCount).not.toBe(1)
 			expect(instanceCount).toBe(3)

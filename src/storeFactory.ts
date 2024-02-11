@@ -10,9 +10,9 @@ type SharedStateStore = {
 		};
 };
 
-const isFn = (value: any): value is Function  => typeof value === "function";
+const isFn = (value: unknown): value is Function  => typeof value === "function"
 
-const apply = (p1:unknown,p2:{}) => isFn(p1) ? p1(p2) : {...p1 as {},...p2}
+const apply = (p1:unknown,p2:object) => isFn(p1) ? p1(p2) : {...p1 as object,...p2}
 
 const createStore = () => {
 	const sharedState = new Map<Topic, SharedStateStore>()
@@ -30,7 +30,7 @@ const createStore = () => {
 					return sharedState.get(topic)!.getState()
 				},
 				subscribe: (cb, transformer) => {
-					cb = cb ?? (() => {});
+					cb = cb ?? (() => {})
 					subscribers.add(cb)
 					if (isFn(transformer)) state = transformer
 					return {
