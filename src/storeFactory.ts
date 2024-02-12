@@ -25,7 +25,7 @@ const createStore = () => {
 			sharedState.set(topic, {
 				getState: () => isFn(state) ? state() : { ...state },
 				setState: (newState) => {
-					state = (apply(state, newState)) || state
+					state = isFn(newState) ? newState(state as State) : {...state, ...newState} || state
 					state && subscribers.forEach(cb => cb(state as State))
 					return sharedState.get(topic)!.getState()
 				},
