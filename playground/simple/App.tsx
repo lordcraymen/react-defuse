@@ -4,16 +4,15 @@ import { withDefUse, updateDef } from "../../src/withDefUse"
 import { Route } from "../../src/Route"
 
 
-const Test = withDefUse(({text}:{text:string})=> text)
+const TestComponentWithDefUse = withDefUse(({ foo }: { foo?: string }) => foo)
+const OtherComponentWithDefUse = withDefUse(({ bar }: { bar?: string }) => bar)
 
 const App = () => (
 	<div>
 		<h1>Playground</h1>
 		<input type="text" onChange={(e) => updateDef("test",{text: e.target.value})} />
-		<Route from="test" fromField="text" to="tust" toField="text" />
-		<div style={{border:"1px solid red"}}>
-		<Test USE="tust" />
-		</div>
+		<OtherComponentWithDefUse DEF="TO" />
+		<TestComponentWithDefUse DEF="FROM" foo="First Test" />
 	</div>
 )
 
