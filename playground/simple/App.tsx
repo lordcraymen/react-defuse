@@ -13,6 +13,7 @@ const App = () => (
 		<input type="text" onChange={(e) => updateDef("test",{text: e.target.value})} />
 		<OtherComponentWithDefUse DEF="TO" />
 		<TestComponentWithDefUse DEF="FROM" foo="First Test" />
+		<Route from="FROM" fromField="foo" to="TO" toField="bar" />
 	</div>
 )
 
