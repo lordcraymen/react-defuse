@@ -15,11 +15,16 @@ const withDefUse = <P extends object>(Component: React.ComponentType<P>) => (p: 
 	const subscripton = topic.subscribe((newState) => { newState && setSharedState(newState) }) 
 
 	useEffect(() => { 
-		DEF && !isEmpty(props) && subscripton.syncState(props) 
+		DEF && !isEmpty(props) && !isEmpty(sharedState) && subscripton.syncState({ ...props, ...sharedState }) 
 		return () => { subscripton.unsubscribe() } 
-	}, [props,subscripton,DEF])
+	}, [props,subscripton,DEF,sharedState])
 
-	return <Component {...{ ...props, ...sharedState } as unknown as P} />
+	let localState = {}
+
+	if(DEF) localState = { ...props, ...sharedState } // sharedState will always override local state
+	if(USE) localState = { ...sharedState, ...props } // local state will override shared state
+
+	return <Component {...localState as unknown as P} />
 }
 
 export { withDefUse, updateDef }
