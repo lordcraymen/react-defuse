@@ -58,7 +58,9 @@ const withDefContextMap = (Component, transform = passThrough) => {
 	return ComponentWithDefContextMap
 }
 
-const Route = ({ from, fromField, to, toField }: { from: string, fromField: string, to: string, toField: string }) => {
+type Topic = string | symbol
+
+const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: string, to: Topic, toField: string }) => {
 	const previousFromFieldValue = useRef()
 
 	useLayoutEffect(() => {
@@ -88,16 +90,19 @@ const Route = ({ from, fromField, to, toField }: { from: string, fromField: stri
 	return null
 }
 
-const Script = withDefContextMap(({ src, children, DEF, USE, ...restProps }) => {
+const ScriptInstance = withDefContextMap(withUseContextMap((props) => null))
 
+const Script = withDefContextMap(({ src, children, DEF, ...restProps }) => {
+
+	console.log(restProps)
 	const transform = typeof src || children === "function" ? src || children : passThrough
-	
-	useLayoutEffect(() => { 
-		console.log("updating use context", { ...restProps,...transform({...restProps}) })
-		DEF && updateUSEContext(DEF,{ ...restProps,...transform({...restProps}) })
-	},[DEF,transform,restProps])
-	
-	return null
+	const scriptOut = transform(restProps)
+	const scriptInstanceSymbol = useRef(Symbol("Scriptinstance_"+DEF))
+	return <>
+		{Object.keys({...scriptOut}).map(k =>  DEF && <Route key={k} from={scriptInstanceSymbol.current} fromField={k} to={DEF} toField={k}  /> )}
+		<ScriptInstance DEF={scriptInstanceSymbol.current} {...scriptOut} />
+		
+	</>
 	
 })
 
@@ -113,9 +118,13 @@ const testString = "this should be present as many times as Test Components with
 
 const staticTransform = ({ foo, bar }) => { const result = { result: foo + bar }; return result }
 
+const Updater = ({children=(t)=>t,t=""}) => {
+	const [text, setText] = useState(t) 
+	return <><input type="text" value={text} onChange={(e) => setText(e.target.value)} /><br />{children(text)}</>
+}
+
 function App() {
 
-	const [testText, setTestText] = useState(testString)
 	const [topic, setTopic] = useState("test")
 
 	return (
@@ -124,21 +133,22 @@ function App() {
 				<option>Test</option>
 				<option>Blub</option>
 			</select>
-			<input type="text" value={testText} onChange={(e) => setTestText(e.target.value)} /><br />
+			<Updater>{(text)=> <Tost taxt={text} DEF="tost" />}</Updater><br />
 			<Test text="hallo" USE={topic} /><br />
 			<Test text="bello" USE={topic} /><br />
 			<Test text="dello" USE={topic} /><br />
 			<Test DEF={topic} /><br />
-			<Tost taxt={testText} DEF="tost" /><br />
 			<Route from="tost" fromField="taxt" to={topic} toField="text" />
 			<br />
 			<br />
-			<Test DEF="Input" text={testText} /><br />
+			<Updater>{(text)=> <Test DEF="Input" text={text} />}</Updater>
+			<br />
+			<br />
 			<Route from="Input" fromField="text" to="Script" toField="bar" />
 			<Script DEF="Script" foo="hallo: " src={staticTransform}></Script>
 			<Route from="Script" fromField="result" to="Output" toField="text" />
 			<Test DEF="Output" />
-
+			
 
 
 			{ /*
