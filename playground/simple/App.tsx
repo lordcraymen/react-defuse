@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react"
 import { createRoot } from "react-dom/client"
 
-const passThrough = (v) => v
+type PureTransformFunction<T> = (input: T) => T;
+const passThrough: PureTransformFunction<object> = (v) => v
 
 const useSubscriptionContext = (contextMap, key, subscriber) => {
 	useEffect(() => {
@@ -29,11 +30,7 @@ const withUseContextMap = (Component) => {
 	const ComponentWithUseContextMap = (props) => {
 		const { USE, ...restProps } = props
 		const [state, setState] = useState(defContextMap.get(USE)?.state)
-
-
 		useSubscriptionContext(useContextMap, USE, setState)
-
-
 		return <Component {...{ ...props, ...state }} />
 	}
 
@@ -60,6 +57,24 @@ const withDefContextMap = (Component, transform = passThrough) => {
 
 type Topic = string | symbol
 
+
+const routeContextMap = new Map<Topic,Set<PureTransformFunction<object>>>()
+const updateRouteContext = (DEF, value: object) => {
+	const routes = Array.from(routeContextMap.get(DEF) || [])
+    const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route(previousValue), value) : {}
+    return routeValue
+};
+
+
+const withRouteContextMap = (Component) => {
+	const ComponentWithRouteContextMap = (props) => {
+		const { DEF, ...restProps } = props
+		useEffect(() => { DEF && updateRouteContext(DEF, ({ ...restProps })) }, [DEF, restProps])
+		return <Component {...props } />
+	}
+	return ComponentWithRouteContextMap
+}
+
 const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: string, to: Topic, toField: string }) => {
 	const previousFromFieldValue = useRef()
 
@@ -69,7 +84,7 @@ const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: strin
 
 			const route = (fromState) => {
 				if (previousFromFieldValue.current !== fromState[fromField]) {
-					updateDEFContext(to, { [toField]: fromState[fromField] })
+					updateDEFContext(to, { ...fromState,[toField]: fromState[fromField] })
 					previousFromFieldValue.current = fromState[fromField]
 				}
 			}
@@ -90,28 +105,24 @@ const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: strin
 	return null
 }
 
-const ScriptInstance = withDefContextMap(withUseContextMap((props) => null))
+interface ScriptProps<T> {
+	src?: PureTransformFunction<T>;
+	children?: PureTransformFunction<T>;
+	[key: string]: unknown;
+  }
 
-const Script = withDefContextMap(({ src, children, DEF, ...restProps }) => {
-
-	console.log(restProps)
-	const transform = typeof src || children === "function" ? src || children : passThrough
-	const scriptOut = transform(restProps)
-	const scriptInstanceSymbol = useRef(Symbol("Scriptinstance_"+DEF))
-	return <>
-		{Object.keys({...scriptOut}).map(k =>  DEF && <Route key={k} from={scriptInstanceSymbol.current} fromField={k} to={DEF} toField={k}  /> )}
-		<ScriptInstance DEF={scriptInstanceSymbol.current} {...scriptOut} />
-		
-	</>
-	
-})
+const Script = ({ src, children, ...restProps }: ScriptProps<typeof restProps>) => {
+	const transform = typeof (src || children) === 'function' ? (src || children) : passThrough;
+	const ScriptInstance = withDefContextMap(withUseContextMap((props) => null), transform);
+	return <ScriptInstance {...restProps} />;
+  };
 
 
 const ProtoTest = ({ text }) => text
-const Test = withDefContextMap(withUseContextMap(ProtoTest))
+const Test = withDefContextMap(withUseContextMap(withRouteContextMap(ProtoTest)))
 
 const ProtoTost = ({ taxt }) => taxt
-const Tost = withDefContextMap(withUseContextMap(ProtoTost))
+const Tost = withDefContextMap(withUseContextMap(withRouteContextMap(ProtoTost)))
 
 
 const testString = "this should be present as many times as Test Components with a DEF or USE property set to 'test'"
@@ -148,19 +159,15 @@ function App() {
 			<Script DEF="Script" foo="hallo: " src={staticTransform}></Script>
 			<Route from="Script" fromField="result" to="Output" toField="text" />
 			<Test DEF="Output" />
-			
-
-
-			{ /*
-			<Test DEF="Output" />
 			<Route from="Input" fromField="text" to="Script" toField="bar" />
 			<Route from="Script" fromField="result" to="Output" toField="text" />
-			<Script USE="Script" />
+			
+			<Script DEF="scriptTest" USE="Script"/>
 			<Route from="Input" fromField="text" to="scriptTest" toField="bar" />
 			<Route from="scriptTest" fromField="result" to="SecondOutput" toField="text" />
 			<Test DEF="SecondOutput"/>
-			*/
-			}
+			
+			
 		</>
 	)
 }
