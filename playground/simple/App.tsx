@@ -102,7 +102,7 @@ const Route = ({ from, fromField, to, toField } : Route) => {
 
 			//useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), route]))
 			routeCallbackMap.set(from,()=>console.log("def",from))
-			const routeFrom = routeContextMap.get(from)
+			const routeFrom = routeCallbackMap.get(from)
 
 			useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), routeFrom]))
 			
