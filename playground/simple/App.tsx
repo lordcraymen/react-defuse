@@ -59,6 +59,8 @@ type Topic = string | symbol
 
 
 const routeContextMap = new Map<Topic,Set<PureTransformFunction<object>>>()
+const routeCallbackMap = new Map<Topic,Function>()
+
 const updateRouteContext = (DEF, value: object) => {
 	const routes = Array.from(routeContextMap.get(DEF) || [])
     const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route(previousValue), value) : {}
@@ -75,26 +77,44 @@ const withRouteContextMap = (Component) => {
 	return ComponentWithRouteContextMap
 }
 
-const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: string, to: Topic, toField: string }) => {
+type Route = {
+	from: Topic, 
+	fromField: string, 
+	to: Topic, 
+	toField: string
+}
+
+const Route = ({ from, fromField, to, toField } : Route) => {
 	const previousFromFieldValue = useRef()
 
 	useLayoutEffect(() => {
 		let cleanUpRoute
 		if (to && toField && from && fromField) {
 
+			/*
 			const route = (fromState) => {
 				if (previousFromFieldValue.current !== fromState[fromField]) {
 					updateDEFContext(to, { ...fromState,[toField]: fromState[fromField] })
 					previousFromFieldValue.current = fromState[fromField]
 				}
 			}
+			*/
 
-			useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), route]))
+			//useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), route]))
+			routeCallbackMap.set(from,()=>console.log("def",from))
+			const routeFrom = routeContextMap.get(from)
+
+			useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), routeFrom]))
+			
+			
 			cleanUpRoute = () => {
 				const currentSubscribers = useContextMap.get(from)
 				if (currentSubscribers) {
-					currentSubscribers.delete(route)
-					if (currentSubscribers.size === 0) useContextMap.delete(from)
+					currentSubscribers.delete(routeFrom)
+					if (currentSubscribers.size === 0) { 
+						useContextMap.delete(from)
+						routeContextMap.delete(from) 
+					}
 				}
 			}
 		}
