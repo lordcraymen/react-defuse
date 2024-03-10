@@ -59,13 +59,20 @@ type Topic = string | symbol
 
 
 const routeContextMap = new Map<Topic,Set<PureTransformFunction<object>>>()
-const routeCallbackMap = new Map<Topic,Function>()
+const routeCallbackMap = new Map<Topic,(state:object) => object>()
 
 const updateRouteContext = (DEF, value: object) => {
 	const routes = Array.from(routeContextMap.get(DEF) || [])
-    const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route(previousValue), value) : {}
-    return routeValue
-};
+	const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route(previousValue), value) : {}
+	return routeValue
+}
+
+
+const useRouteContext = (topic:Topic,fromField,toField) => {s
+	const setRouteValue = (state:object) => state
+	useLayoutEffect(()=> {},[topic,fromField,toField])
+s	return {value:{},setRouteValue}
+}
 
 
 const withRouteContextMap = (Component) => {
@@ -132,10 +139,10 @@ interface ScriptProps<T> {
   }
 
 const Script = ({ src, children, ...restProps }: ScriptProps<typeof restProps>) => {
-	const transform = typeof (src || children) === 'function' ? (src || children) : passThrough;
-	const ScriptInstance = withDefContextMap(withUseContextMap((props) => null), transform);
-	return <ScriptInstance {...restProps} />;
-  };
+	const transform = typeof (src || children) === "function" ? (src || children) : passThrough
+	const ScriptInstance = withDefContextMap(withUseContextMap((props) => null), transform)
+	return <ScriptInstance {...restProps} />
+}
 
 
 const ProtoTest = ({ text }) => text
