@@ -4,15 +4,16 @@ import { createRoot } from "react-dom/client"
 type PureTransformFunction<T> = (input: T) => T;
 const passThrough: PureTransformFunction<object> = (v) => v
 
-const useSubscriptionContext = (contextMap, key, subscriber) => {
-	useEffect(() => {
-		if (key && subscriber) {
+const useSubscriptionContext = (contextMap:Map<Topic,Set<unknown>>, key:Topic, subscriberFactory:(topic:Topic) => unknown) => {
+	useLayoutEffect(() => {
+		let subscriber
+		if (key && typeof subscriberFactory === "function") {
+			subscriber = subscriberFactory(key)
 			const currentSubscribers = contextMap.get(key) || new Set()
-			currentSubscribers.add(subscriber)
+			currentSubscribers.add(subscriberFactory(key))
 			contextMap.set(key, currentSubscribers)
 		}
 
-		// Cleanup on unmount or key change
 		return () => {
 			const currentSubscribers = contextMap.get(key)
 			if (currentSubscribers) {
@@ -20,7 +21,7 @@ const useSubscriptionContext = (contextMap, key, subscriber) => {
 				if (currentSubscribers.size === 0) contextMap.delete(key)
 			}
 		}
-	}, [contextMap, key, subscriber])
+	}, [contextMap, key, subscriberFactory])
 }
 
 const useContextMap = new Map()
@@ -30,7 +31,7 @@ const withUseContextMap = (Component) => {
 	const ComponentWithUseContextMap = (props) => {
 		const { USE, ...restProps } = props
 		const [state, setState] = useState(defContextMap.get(USE)?.state)
-		useSubscriptionContext(useContextMap, USE, setState)
+		useSubscriptionContext(useContextMap, USE, () => setState)
 		return <Component {...{ ...props, ...state }} />
 	}
 
@@ -46,7 +47,7 @@ const withDefContextMap = (Component, transform = passThrough) => {
 		const { DEF, ...restProps } = props
 		const [state, setState] = useState(transform(restProps))
 		const sharedState = { state, setState }
-
+		//useSubscriptionContext(defContextMap,DEF,() => sharedState )
 		useLayoutEffect(() => { DEF && defContextMap.set(DEF, sharedState); return () => { defContextMap.delete(DEF) } }, [DEF, sharedState])
 		useEffect(() => { DEF && updateUSEContext(DEF, transform({ ...state, ...restProps })) }, [DEF, restProps, state, transform])
 
@@ -139,10 +140,11 @@ const Script = ({ src, children, ...restProps }: ScriptProps<typeof restProps>) 
 
 
 const ProtoTest = ({ text }) => text
-const Test = withDefContextMap(withUseContextMap(withRouteContextMap(ProtoTest)))
+const Test = withDefContextMap(withUseContextMap(ProtoTest))
 
 const ProtoTost = ({ taxt }) => taxt
-const Tost = withDefContextMap(withUseContextMap(withRouteContextMap(ProtoTost)))
+const Tost = withDefContextMap(withUseContextMap(ProtoTost))
+
 
 
 const testString = "this should be present as many times as Test Components with a DEF or USE property set to 'test'"
