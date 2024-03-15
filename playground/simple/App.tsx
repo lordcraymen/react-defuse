@@ -10,7 +10,7 @@ const useSubscriptionContext = (contextMap:Map<Topic,Set<unknown>>, key:Topic, s
 		if (key && typeof subscriberFactory === "function") {
 			subscriber = subscriberFactory(key)
 			const currentSubscribers = contextMap.get(key) || new Set()
-			currentSubscribers.add(subscriberFactory(key))
+			currentSubscribers.add(subscriber)
 			contextMap.set(key, currentSubscribers)
 		}
 
@@ -69,10 +69,10 @@ const updateRouteContext = (DEF, value: object) => {
 }
 
 
-const useRouteContext = (topic:Topic,fromField,toField) => {s
+const useRouteContext = (topic:Topic,fromField,toField) => {
 	const setRouteValue = (state:object) => state
 	useLayoutEffect(()=> {},[topic,fromField,toField])
-s	return {value:{},setRouteValue}
+	return {value:{},setRouteValue}
 }
 
 
@@ -109,7 +109,7 @@ const Route = ({ from, fromField, to, toField } : Route) => {
 			*/
 
 			//useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), route]))
-			routeCallbackMap.set(from,()=>console.log("def",from))
+			routeCallbackMap.set(from,()=> console.log("def",from) )
 			const routeFrom = routeCallbackMap.get(from)
 
 			useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), routeFrom]))
