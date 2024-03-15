@@ -65,22 +65,19 @@ const routeCallbackMap = new Map<Topic,(state:object) => object>()
 const updateRouteContext = (DEF, value: object) => {
 	const routes = Array.from(routeContextMap.get(DEF) || [])
 	const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route(previousValue), value) : {}
+	console.log("routevalue",routeValue)
 	return routeValue
 }
 
-
-const useRouteContext = (topic:Topic,fromField,toField) => {
-	const setRouteValue = (state:object) => state
-	useLayoutEffect(()=> {},[topic,fromField,toField])
-	return {value:{},setRouteValue}
-}
 
 
 const withRouteContextMap = (Component) => {
 	const ComponentWithRouteContextMap = (props) => {
 		const { DEF, ...restProps } = props
-		useEffect(() => { DEF && updateRouteContext(DEF, ({ ...restProps })) }, [DEF, restProps])
-		return <Component {...props } />
+		const [routeState,setRouteState] = useState(restProps)
+		//useSubscriptionContext(routeContextMap,DEF,() => setRouteState)
+		useLayoutEffect(() => { DEF && updateRouteContext(DEF, ({ ...restProps })) }, [DEF, restProps])
+		return <Component {...{...props }} />
 	}
 	return ComponentWithRouteContextMap
 }
@@ -92,37 +89,26 @@ type Route = {
 	toField: string
 }
 
-const Route = ({ from, fromField, to, toField } : Route) => {
+const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: string, to: Topic, toField: string }) => {
 	const previousFromFieldValue = useRef()
 
 	useLayoutEffect(() => {
 		let cleanUpRoute
 		if (to && toField && from && fromField) {
 
-			/*
 			const route = (fromState) => {
 				if (previousFromFieldValue.current !== fromState[fromField]) {
 					updateDEFContext(to, { ...fromState,[toField]: fromState[fromField] })
 					previousFromFieldValue.current = fromState[fromField]
 				}
 			}
-			*/
 
-			//useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), route]))
-			//routeCallbackMap.set(from,()=> console.log("def",from) )
-			const routeFrom = routeCallbackMap.get(from)
-
-			useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), routeFrom]))
-			
-			
+			useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), route]))
 			cleanUpRoute = () => {
 				const currentSubscribers = useContextMap.get(from)
 				if (currentSubscribers) {
-					currentSubscribers.delete(routeFrom)
-					if (currentSubscribers.size === 0) { 
-						useContextMap.delete(from)
-						routeContextMap.delete(from) 
-					}
+					currentSubscribers.delete(route)
+					if (currentSubscribers.size === 0) useContextMap.delete(from)
 				}
 			}
 		}
@@ -147,11 +133,10 @@ const Script = ({ src, children, ...restProps }: ScriptProps<typeof restProps>) 
 
 
 const ProtoTest = ({ text }) => text
-const Test = withDefContextMap(withUseContextMap(ProtoTest))
+const Test = withRouteContextMap(withDefContextMap(withUseContextMap(ProtoTest)))
 
 const ProtoTost = ({ taxt }) => taxt
-const Tost = withDefContextMap(withUseContextMap(ProtoTost))
-
+const Tost = withRouteContextMap(withDefContextMap(withUseContextMap(ProtoTost)))
 
 
 const testString = "this should be present as many times as Test Components with a DEF or USE property set to 'test'"
