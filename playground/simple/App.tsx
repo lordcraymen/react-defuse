@@ -4,33 +4,31 @@ import { createRoot } from "react-dom/client"
 type PureTransformFunction<T> = (input: T) => T;
 const passThrough: PureTransformFunction<object> = (v) => v
 
-const useSubscriptionContext = (contextMap:Map<Topic,Set<unknown>>, key:Topic, subscriberFactory:(topic:Topic) => unknown) => {
+const useSubscriptionContext = (contextMap: Map<Topic, Set<unknown>>, key: Topic | undefined, subscriberFactory: (topic: Topic) => unknown) => {
 	useLayoutEffect(() => {
-		let subscriber
-		if (key && typeof subscriberFactory === "function") {
-			subscriber = subscriberFactory(key)
-			const currentSubscribers = contextMap.get(key) || new Set()
-			currentSubscribers.add(subscriber)
-			contextMap.set(key, currentSubscribers)
-		}
+		if (!key || typeof subscriberFactory !== "function") return
+
+		const subscriber = subscriberFactory(key)
+
+		const currentSubscribers = contextMap.get(key) ?? new Set()
+		currentSubscribers.add(subscriber)
+		contextMap.set(key, currentSubscribers)
 
 		return () => {
-			const currentSubscribers = contextMap.get(key)
-			if (currentSubscribers) {
-				currentSubscribers.delete(subscriber)
-				if (currentSubscribers.size === 0) contextMap.delete(key)
-			}
+			currentSubscribers.delete(subscriber)
+			if (currentSubscribers.size === 0)  contextMap.delete(key)
 		}
 	}, [contextMap, key, subscriberFactory])
 }
+
 
 const useContextMap = new Map()
 const updateUSEContext = async (USE, value) => { useContextMap.get(USE)?.forEach(setState => setState(value)) }
 
 const withUseContextMap = (Component) => {
-	const ComponentWithUseContextMap = (props) => {
-		const { USE, ...restProps } = props
-		const [state, setState] = useState(defContextMap.get(USE)?.state)
+	const ComponentWithUseContextMap = (props:{USE?:Topic}) => {
+		const { USE } = props
+		const [state, setState] = useState(defContextMap.get(USE)?.state || {})
 		useSubscriptionContext(useContextMap, USE, () => setState)
 		return <Component {...{ ...props, ...state }} />
 	}
@@ -39,16 +37,19 @@ const withUseContextMap = (Component) => {
 }
 
 
-const defContextMap = new Map()
-const updateDEFContext = async (DEF, value) => { defContextMap.get(DEF)?.setState(value); return value }
+const defContextMap = new Map<Topic,Set<{state:object,setState:(value:object)=>void}>>()
+const updateDEFContext = (DEF, value) => { 
+	defContextMap.get(DEF)?.forEach(sub => sub.setState(value)) 
+	return value
+}
 
 const withDefContextMap = (Component, transform = passThrough) => {
-	const ComponentWithDefContextMap = (props) => {
+	const ComponentWithDefContextMap = (props:{DEF?:Topic}) => {
 		const { DEF, ...restProps } = props
 		const [state, setState] = useState(transform(restProps))
 		const sharedState = { state, setState }
-		//useSubscriptionContext(defContextMap,DEF,() => sharedState )
-		useLayoutEffect(() => { DEF && defContextMap.set(DEF, sharedState); return () => { defContextMap.delete(DEF) } }, [DEF, sharedState])
+		useSubscriptionContext(defContextMap,DEF,() => sharedState)
+		//useLayoutEffect(() => { DEF && defContextMap.set(DEF, sharedState); return () => { defContextMap.delete(DEF) } }, [DEF, sharedState])
 		useEffect(() => { DEF && updateUSEContext(DEF, transform({ ...state, ...restProps })) }, [DEF, restProps, state, transform])
 
 		return <Component {...{ ...state, ...props }} />
@@ -64,16 +65,16 @@ const routeCallbackMap = new Map<Topic,(state:object) => object>()
 
 const updateRouteContext = (DEF, value: object) => {
 	const routes = Array.from(routeContextMap.get(DEF) || [])
-	const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route(previousValue), value) : {}
-	console.log("routevalue",routeValue)
+	const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route.setState(previousValue), value) : {}
+	//console.log("routevalue",routeValue)
 	return routeValue
 }
 
 
 
 const withRouteContextMap = (Component) => {
-	const ComponentWithRouteContextMap = (props) => {
-		const { DEF, ...restProps } = props
+	const ComponentWithRouteContextMap = (props:{DEF?:Topic}) => {
+		const { DEF, ...restProps } = props 
 		const [routeState,setRouteState] = useState(restProps)
 		//useSubscriptionContext(routeContextMap,DEF,() => setRouteState)
 		useLayoutEffect(() => { DEF && updateRouteContext(DEF, ({ ...restProps })) }, [DEF, restProps])
@@ -81,6 +82,7 @@ const withRouteContextMap = (Component) => {
 	}
 	return ComponentWithRouteContextMap
 }
+
 
 type Route = {
 	from: Topic, 
