@@ -66,8 +66,7 @@ const routeCallbackMap = new Map<Topic,(state:object) => object>()
 
 const updateRouteContext = (DEF, value: object) => {
 	const routes = Array.from(routeContextMap.get(DEF) || [])
-	const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route.setState(previousValue), value) : {}
-	//console.log("routevalue",routeValue)
+	const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route.state, value) : {}
 	return routeValue
 }
 
@@ -76,8 +75,8 @@ const updateRouteContext = (DEF, value: object) => {
 const withRouteContextMap = (Component) => {
 	const ComponentWithRouteContextMap = (props:{DEF?:Topic}) => {
 		const { DEF, ...restProps } = props 
-		const [routeState,setRouteState] = useState(restProps)
-		//useSubscriptionContext(routeContextMap,DEF,() => setRouteState)
+		const [state,setState] = useState(restProps)
+		useSubscriptionContext(routeContextMap,DEF,() => ({state,setState}))
 		useLayoutEffect(() => { DEF && updateRouteContext(DEF, ({ ...restProps })) }, [DEF, restProps])
 		return <Component {...{...props }} />
 	}
