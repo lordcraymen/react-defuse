@@ -38,8 +38,9 @@ const withUseContextMap = (Component) => {
 
 
 const defContextMap = new Map<Topic,Set<{state:object,setState:(value:object)=>void}>>()
+
 const updateDEFContext = (DEF, value) => { 
-	defContextMap.get(DEF)?.forEach(sub => sub.setState(value)) 
+	defContextMap.get(DEF)?.forEach(subscriber => subscriber.setState(value)) 
 	return value
 }
 
