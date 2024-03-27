@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react"
 import { createRoot } from "react-dom/client"
+import { useSubscriptionContext } from "./Components/useSubscriptionContext";
+import { withDefContextMap } from "./Components/withDefContextMap";
+import { withUseContextMap } from "./Components/withDefContextMap";
 
 type PureTransformFunction<T> = (input: T) => T;
 const passThrough: PureTransformFunction<object> = (v) => v
@@ -59,8 +62,6 @@ const withDefContextMap = (Component, transform = passThrough) => {
 }
 
 type Topic = string | symbol
-
-
 const routeContextMap = new Map<Topic,Set<PureTransformFunction<object>>>()
 const routeCallbackMap = new Map<Topic,(state:object) => object>()
 
@@ -92,6 +93,7 @@ type Route = {
 }
 
 const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: string, to: Topic, toField: string }) => {
+	/*
 	const previousFromFieldValue = useRef()
 
 	useLayoutEffect(() => {
@@ -117,6 +119,7 @@ const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: strin
 
 		return () => { cleanUpRoute && cleanUpRoute() }
 	}, [from, fromField, to, toField])
+	*/
 
 	return null
 }
