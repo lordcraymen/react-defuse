@@ -11,10 +11,10 @@ const getDefValue = (DEF) => defContextMap.get(DEF)?.values().next().value?.stat
 const withDefContext = (Component) => {
 	const ComponentWithDefContextMap = (props) => {
 		const { DEF,USE, ...restProps } = props
-		const [state, setState] = useState({})
-		const sharedState = { state, setState }
+		const [state, setState] = useState({text:"test"})
+		const sharedState = { restProps, setState }
 		useSubscriptionContext(defContextMap, DEF, sharedState )
-		useLayoutEffect(() => { DEF && setUseValue(DEF,{ ...restProps, ...state }) }, [DEF, restProps, state])
+		useLayoutEffect(() => { DEF && setUseValue(DEF,restProps) }, [DEF, restProps, state])
 		return <Component {...{ ...props, ...state }} />
 	}
 	return ComponentWithDefContextMap

@@ -10,6 +10,7 @@ const withUseContext = (Component) => {
 	const ComponentWithUseContextMap = (props) => {
 		const { USE } = props
 		const [state, setState] = useState(getDefValue(USE))
+		console.log("withUse",state)
 		useSubscriptionContext(useContextMap, USE, setState)
 		return <Component {...{ ...props, ...state }} />
 	}
