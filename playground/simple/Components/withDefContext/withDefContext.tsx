@@ -4,20 +4,17 @@ import { setUseValue } from "../withUseContext"
 import { Topic } from "../types"
 
 
-const defContextMap = new Map<Topic,Set<{state:object,setState:(v:object) => void}>>()
-const setDefValue = (DEF, value) => defContextMap.get(DEF)?.values().next().value?.setState(value)
-const getDefValue = (DEF) => defContextMap.get(DEF)?.values().next().value?.state
+const defContextMap = new Map<Topic,Set<{}>>()
+const getDefValue = (DEF) => defContextMap.get(DEF)?.values().next().value
 
 const withDefContext = (Component) => {
 	const ComponentWithDefContextMap = (props) => {
-		const { DEF,USE, ...restProps } = props
-		const [state, setState] = useState({text:"test"})
-		const sharedState = { restProps, setState }
-		useSubscriptionContext(defContextMap, DEF, sharedState )
-		useLayoutEffect(() => { DEF && setUseValue(DEF,restProps) }, [DEF, restProps, state])
-		return <Component {...{ ...props, ...state }} />
+		const { DEF,USE, ...state } = props
+		useSubscriptionContext(defContextMap, DEF, state)
+		useLayoutEffect(() => { DEF && setUseValue(DEF, state) }, [DEF, state])
+		return <Component {...props} />
 	}
 	return ComponentWithDefContextMap
 }
 
-export { withDefContext, getDefValue, setDefValue }
+export { withDefContext, getDefValue }

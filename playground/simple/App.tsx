@@ -12,7 +12,7 @@ const ProtoTost = ({ taxt }) => taxt
 const Tost = withDefContext(withUseContext(ProtoTost))
 
 const Updater = ({ children = (t) => t, t = "" }) => {
-	const [text, setText] = useState(t)
+	const [text, setText] = useState("test")
 	return <><input type="text" value={text} onChange={(e) => setText(e.target.value)} /><br />{children(text)}</>
 }
 
