@@ -11,10 +11,8 @@ const Test = withDefContext(withUseContext(ProtoTest))
 const ProtoTost = ({ taxt }) => taxt
 const Tost = withDefContext(withUseContext(ProtoTost))
 
-const staticTransform = ({ foo, bar }) => { const result = { result: foo + bar }; return result }
-
-const Updater = ({children=(t)=>t,t=""}) => {
-	const [text, setText] = useState(t) 
+const Updater = ({ children = (t) => t, t = "" }) => {
+	const [text, setText] = useState(t)
 	return <><input type="text" value={text} onChange={(e) => setText(e.target.value)} /><br />{children(text)}</>
 }
 
@@ -26,14 +24,19 @@ function App() {
 		<>
 			<select value={topic} onChange={e => setTopic(e.target.value)}>
 				<option>Test</option>
+				<option>Tost</option>
 				<option>Blub</option>
 			</select>
-			<Updater>{(text)=> <Tost taxt={text} DEF="tost" />}</Updater><br />
+			<Updater>{(text) => <Test text={text} DEF={topic} />}</Updater><br />
+			<Test text="hallo" USE={topic} /><br />
+			<Test text="bello" USE={topic} /><br />
+			<Test text="dello" USE={topic} /><br />
+			{ /*
 			<Test text="hallo" USE={topic} /><br />
 			<Test text="bello" USE={topic} /><br />
 			<Test text="dello" USE={topic} /><br />
 			<Test DEF={topic} /><br />
-			<Route from="tost" fromField="taxt" to={topic} toField="text" />
+			<Route from="Tost" fromField="taxt" to={topic} toField="text" />
 			<br />
 			<br />
 			<Updater>{(text)=> <Test DEF="Input" text={text} />}</Updater>
@@ -50,7 +53,8 @@ function App() {
 			<Route from="Input" fromField="text" to="scriptTest" toField="bar" />
 			<Route from="scriptTest" fromField="result" to="SecondOutput" toField="text" />
 			<Test DEF="SecondOutput"/>
-			</>
+			*/}
+		</>
 	)
 }
 
