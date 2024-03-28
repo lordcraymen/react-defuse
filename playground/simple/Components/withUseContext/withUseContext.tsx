@@ -1,11 +1,11 @@
 import React, {useState } from "react"
 import { useSubscriptionContext } from "../useSubscriptionContext"
-import { getDefValue } from "../withDefContextMap"
+import { getDefValue } from "../withDefContext"
 
 const useContextMap = new Map()
 const setUseValue = (USE, value) => { useContextMap.get(USE)?.forEach(setState => setState(value)) }
 
-const withUseContextMap = (Component) => {
+const withUseContext = (Component) => {
 	const ComponentWithUseContextMap = (props) => {
 		const { USE, ...restProps } = props
 		const [state, setState] = useState(getDefValue(USE))
@@ -16,4 +16,4 @@ const withUseContextMap = (Component) => {
 	return ComponentWithUseContextMap
 }
 
-export {withUseContextMap, setUseValue }
+export {withUseContext, setUseValue }
