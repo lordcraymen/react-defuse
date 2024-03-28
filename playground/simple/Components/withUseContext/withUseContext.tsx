@@ -4,10 +4,7 @@ import { getDefValue } from "../withDefContext"
 
 const useContextMap = new Map()
 
-const setUseValue = (USE, value) => { 
-	console.log("updating",USE,value)
-	useContextMap.get(USE)?.forEach(setState => setState(value)) 
-}
+const setUseValue = (USE, value) => { useContextMap.get(USE)?.forEach(setState => setState(value)) }
 
 const withUseContext = (Component) => {
 	const ComponentWithUseContextMap = (props) => {
