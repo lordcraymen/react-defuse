@@ -1,67 +1,48 @@
-import React, { useState, useLayoutEffect } from "react"
+import React, { useLayoutEffect, useCallback } from "react"
 import { useSubscriptionContext } from "../useSubscriptionContext"
-import { getDefValue } from "../withDefContext"
-import { Topic } from "../types"
+import { setDefValue, getDefValue } from "../withDefContext"
+import { Topic, withDEFUSE } from "../types"
 
-type Route = {
+
+type RouteProps = {
 	from: Topic, 
 	fromField: string, 
 	to: Topic, 
 	toField: string
 }
 
-type PureTransformFunction<T> = (input: T) => T;
+const fromRouteContextMap = new Map<Topic,Set<(value:object) => void>>()
+const setRouteValue = (from:Topic,value:object) => fromRouteContextMap.get(from)?.forEach(route => route(value) )
 
-const routeContextMap = new Map<Topic,Set<PureTransformFunction<object>>>()
-const routeCallbackMap = new Map<Topic,(state:object) => object>()
-
-const updateRouteContext = (DEF, value: object) => {
-	const routes = Array.from(routeContextMap.get(DEF) || [])
-	const routeValue = routes.length ? Array.from(routes).reduce((previousValue, route) => route.state, value) : {}
-	return routeValue
+const toRouteContextMap = new Map<Topic,Set<() => object>>()
+const getRouteValue = (to:Topic) => { 
+	//console.log(toRouteContextMap)
+	Array.from(toRouteContextMap.get(to)||[]).reduce((acc,routeValue)=> ({...acc,...routeValue()}),{}) 
 }
 
+
+const Route = ({ from, fromField, to, toField }: RouteProps) => {
+	const fromRoute = useCallback(() => ({[toField]: getDefValue(from)?.[fromField]}),[from,fromField,toField])
+	useSubscriptionContext(toRouteContextMap, to, fromRoute)
+
+	console.log(getDefValue(from))
+	
+	const toRoute = useCallback((value) => setDefValue(to,{[toField]: value[fromField]}),[to,fromField,toField])
+	useSubscriptionContext(fromRouteContextMap, from, toRoute)
+
+	return null
+}
+
+
 const withRouteContext = (Component) => {
-	const ComponentWithRouteContextMap = (props:{DEF?:Topic}) => {
-		const { DEF, ...restProps } = props 
-		const [state,setState] = useState(restProps)
-		useSubscriptionContext(routeContextMap,DEF,() => ({state,setState}))
-		useLayoutEffect(() => { DEF && updateRouteContext(DEF, ({ ...restProps })) }, [DEF, restProps])
+	const ComponentWithRouteContextMap = (props:withDEFUSE) => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { DEF, USE, ...restProps } = props 
+		useLayoutEffect(() => { DEF && setRouteValue(DEF, restProps) }, [DEF, restProps])
+		//console.log("getRouteValue",DEF,getRouteValue(DEF))
 		return <Component {...{...props }} />
 	}
 	return ComponentWithRouteContextMap
-}
-
-const Route = ({ from, fromField, to, toField }: { from: Topic, fromField: string, to: Topic, toField: string }) => {
-	/*
-	const previousFromFieldValue = useRef()
-
-	useLayoutEffect(() => {
-		let cleanUpRoute
-		if (to && toField && from && fromField) {
-
-			const route = (fromState) => {
-				if (previousFromFieldValue.current !== fromState[fromField]) {
-					setDefValue(to, { ...fromState,[toField]: fromState[fromField] })
-					previousFromFieldValue.current = fromState[fromField]
-				}
-			}
-
-			useContextMap.set(from, new Set([...Array.from(useContextMap.get(from) || []), route]))
-			cleanUpRoute = () => {
-				const currentSubscribers = useContextMap.get(from)
-				if (currentSubscribers) {
-					currentSubscribers.delete(route)
-					if (currentSubscribers.size === 0) useContextMap.delete(from)
-				}
-			}
-		}
-
-		return () => { cleanUpRoute && cleanUpRoute() }
-	}, [from, fromField, to, toField])
-	*/
-
-	return null
 }
 
 

@@ -1,2 +1,2 @@
-import { Topic } from "./types";
-export { Topic }
+import { Topic, withDEFUSE } from "./types"
+export { Topic, withDEFUSE }

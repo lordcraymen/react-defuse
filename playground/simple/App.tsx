@@ -1,19 +1,20 @@
 import React, { useState } from "react"
 import { createRoot } from "react-dom/client"
-import { withDefContext } from "./Components/withDefContext";
-import { withUseContext } from "./Components/withUseContext";
-import { Route } from "./Components/withRouteContext";
-import { Script } from "./Components/withScriptContext";
+import { withDefContext, setDefValue } from "./Components/withDefContext"
+import { withRouteContext, Route } from "./Components/withRouteContext"
+import { withUseContext } from "./Components/withUseContext"
+//import { Route } from "./Components/withRouteContext"
+//import { Script } from "./Components/withScriptContext"
 
 const ProtoTest = ({ text }) => text
-const Test = withDefContext(withUseContext(ProtoTest))
+const Test = withDefContext(withRouteContext(withUseContext(ProtoTest)))
 
 const ProtoTost = ({ taxt }) => taxt
-const Tost = withDefContext(withUseContext(ProtoTost))
+const Tost = withDefContext(withRouteContext(withUseContext(ProtoTost)))
 
-const Updater = ({ children = (t) => t, t = "" }) => {
-	const [text, setText] = useState("test")
-	return <><input type="text" value={text} onChange={(e) => setText(e.target.value)} /><br />{children(text)}</>
+const Updater = ({children}:{children:(string) => React.JSX.Element}) => {
+	const [text,setText] = useState("")
+	return <><input type="text" value={text} onChange={(e) => { setText(e.target.value )}} />{children(text)}</>
 }
 
 function App() {
@@ -27,10 +28,15 @@ function App() {
 				<option>Tost</option>
 				<option>Blub</option>
 			</select>
-			<Updater>{(text) => <Test text={text} DEF={topic} />}</Updater><br />
+			<Updater>{(text) => <Test text={text} DEF={topic} /> }</Updater><br />
+			<br />
 			<Test text="hallo" USE={topic} /><br />
 			<Test text="bello" USE={topic} /><br />
 			<Test text="dello" USE={topic} /><br />
+			<br />
+			<br />
+			<Tost DEF="wuppig" taxt="das ist das taxtfeld"/>
+			<Route from={topic} fromField="text" to="wuppig" toField="taxt" />
 			{ /*
 			<Test text="hallo" USE={topic} /><br />
 			<Test text="bello" USE={topic} /><br />
