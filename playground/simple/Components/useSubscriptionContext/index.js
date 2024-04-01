@@ -1,2 +1,2 @@
-import { useSubscriptionContext } from "./useSubscriptionContext";
-export { useSubscriptionContext }
+import { useSubscriptionContext, useSubscription } from "./useSubscriptionContext"
+export { useSubscriptionContext, useSubscription }

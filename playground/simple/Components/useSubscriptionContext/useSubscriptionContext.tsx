@@ -1,6 +1,10 @@
 import { useLayoutEffect } from "react"
 import { Topic } from "../types"
 
+const useSubscription = <C,>(context:C,subscribe:(context:C)=>()=>void) => {
+	useLayoutEffect(() => { if(context && typeof subscribe === "function") return subscribe(context)} , [context, subscribe])
+}
+
 const useSubscriptionContext = (context: Map<Topic, Set<unknown>>, key: Topic | undefined, subscriber: unknown) => {
 	useLayoutEffect(() => {
 		if (!(context && key && subscriber)) return
@@ -15,4 +19,4 @@ const useSubscriptionContext = (context: Map<Topic, Set<unknown>>, key: Topic | 
 }
 
 
-export { useSubscriptionContext }
+export { useSubscriptionContext, useSubscription }

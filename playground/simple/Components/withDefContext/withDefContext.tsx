@@ -11,7 +11,9 @@ type withDEFUSE = {
 
 const defContextMap = new Map<Topic, Set<object>>()
 
-const getDefValue = (DEF) => defContextMap.get(DEF)?.values().next().value.defValue
+const getDefValue = (DEF) => { 
+	console.log(DEF,defContextMap.get(DEF)?.values().next().value.defValue)
+	return defContextMap.get(DEF)?.values().next().value.defValue }
 const setDefValue = (DEF, value) => defContextMap.get(DEF)?.values().next().value.setDefValue(prevState => ({ ...prevState, ...value }))
 
 const withDefContext = (Component) => {
@@ -19,7 +21,7 @@ const withDefContext = (Component) => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { DEF, USE, ...stateProps } = props
 		const [defValue, setDefValue] = useState({})
-		useSubscriptionContext(defContextMap, props.DEF, { defValue: { ...stateProps, ...defValue }, setDefValue })
+		useSubscriptionContext(defContextMap, DEF, { defValue: { ...stateProps, ...defValue }, setDefValue })
 		useEffect(() => { DEF && setUseValue(DEF, { ...stateProps, ...defValue }) }, [DEF, stateProps, defValue])
 		return <Component {...{ ...props, ...defValue }} />
 	}

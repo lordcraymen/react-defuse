@@ -1,16 +1,14 @@
 import React, { useState } from "react"
 import { createRoot } from "react-dom/client"
-import { withDefContext, setDefValue } from "./Components/withDefContext"
+import { withDefContext } from "./Components/withDefContext"
 import { withRouteContext, Route } from "./Components/withRouteContext"
 import { withUseContext } from "./Components/withUseContext"
-//import { Route } from "./Components/withRouteContext"
-//import { Script } from "./Components/withScriptContext"
 
 const ProtoTest = ({ text }) => text
-const Test = withDefContext(withRouteContext(withUseContext(ProtoTest)))
+const Test = withRouteContext(withDefContext(withUseContext(ProtoTest)))
 
 const ProtoTost = ({ taxt }) => taxt
-const Tost = withDefContext(withRouteContext(withUseContext(ProtoTost)))
+const Tost = withRouteContext(withDefContext(withUseContext(ProtoTost)))
 
 const Updater = ({children}:{children:(string) => React.JSX.Element}) => {
 	const [text,setText] = useState("")
